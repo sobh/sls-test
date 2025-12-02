@@ -1,0 +1,115 @@
+# Service name
+service: book-api
+
+# Custom variables to be used throughout the service
+custom:
+    booksTableName: ${self:service}-BooksTable-${sls:stage}
+
+# Provider configuration
+provider:
+    name: aws
+    runtime: nodejs20.x
+    stage: dev
+    region: "eu-central-1"
+    memorySize: 128
+    timeout: 3
+    environment:
+        BOOKS_TABLE_NAME: !Ref BooksTable
+
+# Functions definition
+functions:
+    listBooks:
+        handler: app/handlers/listBooks.handler
+        description: List all books from DB
+        runtime: nodejs20.x
+        memorySize: 128
+        timeout: 3
+        events:
+            - http:
+                  path: /books
+                  method: get
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:Scan
+                  - dynamodb:Query
+              Resource: !GetAtt BooksTable.Arn
+
+    createBook:
+        handler: app/handlers/createBook.handler
+        description: Create a new book on the DB
+        runtime: nodejs20.x
+        memorySize: 128
+        timeout: 3
+        events:
+            - http:
+                  path: /books
+                  method: post
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:PutItem
+              Resource: !GetAtt BooksTable.Arn
+
+    getBook:
+        handler: app/handlers/getBook.handler
+        description: Get a book by ID
+        runtime: nodejs20.x
+        memorySize: 128
+        timeout: 3
+        events:
+            - http:
+                  path: /books/{bookId}
+                  method: get
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:GetItem
+              Resource: !GetAtt BooksTable.Arn
+
+    updateBook:
+        handler: app/handlers/updateBook.handler
+        description: Update a book by ID
+        runtime: nodejs20.x
+        memorySize: 128
+        timeout: 3
+        events:
+            - http:
+                  path: /books/{bookId}
+                  method: put
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:UpdateItem
+              Resource: !GetAtt BooksTable.Arn
+
+    deleteBook:
+        handler: app/handlers/deleteBook.handler
+        description: Delete a book by ID
+        runtime: nodejs20.x
+        memorySize: 128
+        timeout: 3
+        events:
+            - http:
+                  path: /books/{bookId}
+                  method: delete
+        iamRoleStatements:
+            - Effect: Allow
+              Action:
+                  - dynamodb:DeleteItem
+              Resource: !GetAtt BooksTable.Arn
+
+# CloudFormation resources
+resources:
+    Resources:
+        BooksTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                TableName: ${self:service}-BooksTable-${sls:stage}
+                BillingMode: PAY_PER_REQUEST
+                AttributeDefinitions:
+                    - AttributeName: id
+                      AttributeType: S
+                KeySchema:
+                    - AttributeName: id
+                      KeyType: HASH

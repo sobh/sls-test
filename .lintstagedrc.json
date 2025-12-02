@@ -1,0 +1,9 @@
+{
+	"*.{js,mjs,cjs,ts,mts,cts}": [
+		"eslint --fix",
+		"dprint fmt"
+	],
+	"*.{json,md,yaml,yml}": [
+		"dprint fmt"
+	]
+}
