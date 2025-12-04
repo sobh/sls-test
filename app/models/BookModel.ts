@@ -1,14 +1,9 @@
 import type { Book, BookBody } from '../schemas/BookSchemas';
 
-import {
-	BookRepository,
-	createBookRepository,
-} from '../repositories/BookRepository';
+import { BookRepository, createBookRepository } from '../repositories/BookRepository';
 
 export class BookModel {
-	constructor(
-		private readonly repository: BookRepository,
-	) {}
+	constructor(private readonly repository: BookRepository) {}
 
 	async createBook(bookData: BookBody): Promise<Book> {
 		return this.repository.createBook(bookData);
