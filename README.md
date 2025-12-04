@@ -37,27 +37,36 @@ The project is structured as follows:
 │   ├── clients
 │   │   └── creatDynamoDBClient.ts
 │   ├── handlers
-│   │   ├── createBook.ts
-│   │   ├── deleteBook.ts
-│   │   ├── getBook.ts
-│   │   ├── listBooks.ts
-│   │   └── updateBook.ts
+│   │   ├── books
+│   │   │   ├── createBook.ts
+│   │   │   ├── deleteBook.ts
+│   │   │   ├── getBook.ts
+│   │   │   ├── listBooks.ts
+│   │   │   └── updateBook.ts
+│   │   └── tests
+│   │       ├── testError.ts
+│   │       ├── testExternalCall.ts
+│   │       └── testInternalCall.ts
 │   ├── models
 │   │   └── BookModel.ts
 │   ├── repositories
 │   │   └── BookRepository.ts
-│   └── schemas
-│       └── BookSchemas.ts
+│   ├── schemas
+│   │   └── BookSchemas.ts
+│   └── services
+│       └── logger.ts
 ├── serverless.yaml
 ├── package.json
 └── tsconfig.json
 ```
 
 - `app/clients`: Contains the DynamoDB client.
-- `app/handlers`: Contains the Lambda handlers.
+- `app/handlers`: Contains the Lambda handlers, organized by domain (e.g.,
+  `books`, `tests`).
 - `app/models`: Contains the business logic.
 - `app/repositories`: Contains the database logic.
 - `app/schemas`: Contains the Zod schemas for validation.
+- `app/services`: Contains shared services like the logger.
 - `serverless.yaml`: Contains the Serverless framework configuration.
 - `package.json`: Contains the project dependencies.
 - `tsconfig.json`: Contains the TypeScript configuration.

@@ -1,13 +1,16 @@
 {
-	"lineWidth": 80,
+	"lineWidth": 100,
 	"useTabs": true,
 	"indentWidth": 4,
 	"typescript": {
-		"quoteStyle": "preferSingle"
+		"quoteStyle": "preferSingle",
+		"preferSingleLine": true
 	},
 	"json": {},
 	"markdown": {},
-	"yaml": {},
+	"yaml": {
+		"indentWidth": 2
+	},
 	"excludes": [
 		"**/node_modules",
 		"**/*-lock.json"
