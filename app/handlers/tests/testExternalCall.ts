@@ -14,7 +14,7 @@ import { middyfy } from '../../utils/middyfy';
  * @param context - The Lambda context
  * @returns The API Gateway response
  */
-async function lambdaHandler(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+async function lambdaHandler(_event: APIGatewayProxyEvent): Promise<any> {
 	logger.info('Test External Call Handler');
 	const uri = 'https://jsonplaceholder.typicode.com/todos/1';
 	logger.debug(`Call to external service @ ${uri}`);
@@ -37,10 +37,7 @@ async function lambdaHandler(_event: APIGatewayProxyEvent): Promise<APIGatewayPr
 	const result = { body, headers: Object.fromEntries(response.headers), status: response.status };
 
 	logger.info(`Call to external service @ ${uri} response:`, { response: result });
-	return {
-		statusCode: 200,
-		body: JSON.stringify({ message: 'Test External Call Handler', response: result }),
-	};
+	return { message: 'Test External Call Handler', response: result };
 }
 
 export const handler = middyfy(lambdaHandler);

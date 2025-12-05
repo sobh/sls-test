@@ -11,6 +11,14 @@ plugins:
   - serverless-offline # Allows running the service locally
 
 # ------------------------------------------------------------------------------
+# Build
+# ------------------------------------------------------------------------------
+build:
+  esbuild:
+    banner:
+      js: 'import { createRequire } from "module"; import { fileURLToPath } from "url"; import { dirname } from "path"; const require = createRequire(import.meta.url); const __filename = fileURLToPath(import.meta.url); const __dirname = dirname(__filename);'
+
+# ------------------------------------------------------------------------------
 # Custom Variables
 # ------------------------------------------------------------------------------
 custom:
@@ -22,7 +30,7 @@ custom:
     dev:
       log:
         level: DEBUG
-        event: true
+        event: false
     prod:
       log:
         level: INFO
@@ -157,7 +165,7 @@ functions:
     description: Test Internal Call
     events:
       - httpApi:
-          path: /tests/calls/internal
+          path: /tests/calls/internal/{id}
           method: get
 
   testError:

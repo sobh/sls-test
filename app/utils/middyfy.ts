@@ -1,10 +1,13 @@
 // ---- Imports ----------------------------------------------------------------
 import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
+import { captureLambdaHandler } from '@aws-lambda-powertools/tracer/middleware';
 import middy from '@middy/core';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
+import httpResponseSerializer from '@middy/http-response-serializer';
 import type { Handler } from 'aws-lambda';
 import { logger } from '../services/logger';
+import { tracer } from '../services/tracer';
 
 // ---- Types ------------------------------------------------------------------
 type MiddyOptions = { fallbackMessage?: string; parseJson?: boolean };
@@ -28,6 +31,9 @@ export function middyfy<TEvent = any, TResult = any>(
 ): middy.MiddyfiedHandler<TEvent, TResult> {
 	const middleware = middy(handler);
 
+	// Add Tracing
+	middleware.use(captureLambdaHandler(tracer));
+
 	// Add Lambda Context to the logger
 	middleware.use(injectLambdaContext(logger));
 
@@ -35,6 +41,17 @@ export function middyfy<TEvent = any, TResult = any>(
 	if (options.parseJson) {
 		middleware.use(httpJsonBodyParser());
 	}
+
+	// Add response serializer (application/json)
+	middleware.use(
+		httpResponseSerializer({
+			serializers: [{
+				regex: /^application\/json$/,
+				serializer: ({ body }) => JSON.stringify(body),
+			}],
+			defaultContentType: 'application/json',
+		}),
+	);
 
 	// Always add error handler last
 	middleware.use(httpErrorHandler({

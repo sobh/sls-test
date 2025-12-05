@@ -19,7 +19,7 @@ interface EchoEvent extends Omit<APIGatewayProxyEvent, 'body'> {
  * @param context - The Lambda context
  * @returns The API Gateway response
  */
-async function lambdaHandler(event: EchoEvent, context: Context): Promise<APIGatewayProxyResult> {
+async function lambdaHandler(event: EchoEvent, context: Context): Promise<any> {
 	logger.info('Echo handler - received request', { body: event.body });
 
 	// Get the parsed JSON body (thanks to http-json-body-parser middleware)
@@ -34,7 +34,7 @@ async function lambdaHandler(event: EchoEvent, context: Context): Promise<APIGat
 
 	logger.info('Echo handler - sending response', { response: responseBody });
 
-	return { statusCode: 200, body: JSON.stringify(responseBody) };
+	return responseBody;
 }
 
 export const handler = middyfy(lambdaHandler, { parseJson: true });
