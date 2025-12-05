@@ -1,4 +1,5 @@
 // ---- Imports ----------------------------------------------------------------
+import type { LambdaInterface } from '@aws-lambda-powertools/commons/types';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { z } from 'zod';
 import { BookModel, createBookModel } from '../../models/BookModel';
@@ -6,10 +7,10 @@ import { BookSchema } from '../../schemas/BookSchemas';
 import { middyfy } from '../../utils/middyfy';
 
 // ---- Handler ----------------------------------------------------------------
-class UpdateBookHandler {
+class UpdateBookHandler implements LambdaInterface {
 	constructor(private readonly bookModel: BookModel) {}
 
-	async processEvent(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+	async handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
 		const bookId = event.pathParameters?.bookId ?? '';
 		const validId = z.uuidv7().parse(bookId);
 		const body = event.body || {};
@@ -24,7 +25,7 @@ class UpdateBookHandler {
 async function lambdaHandler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
 	const bookModel = createBookModel();
 	const instance = new UpdateBookHandler(bookModel);
-	return await instance.processEvent(event);
+	return await instance.handler(event);
 }
 
 export const handler = middyfy(lambdaHandler, { parseJson: true });

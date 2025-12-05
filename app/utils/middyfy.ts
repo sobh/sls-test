@@ -1,4 +1,5 @@
 // ---- Imports ----------------------------------------------------------------
+import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
 import middy from '@middy/core';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
@@ -26,6 +27,9 @@ export function middyfy<TEvent = any, TResult = any>(
 	options: MiddyOptions = {},
 ): middy.MiddyfiedHandler<TEvent, TResult> {
 	const middleware = middy(handler);
+
+	// Add Lambda Context to the logger
+	middleware.use(injectLambdaContext(logger));
 
 	// Add JSON body parser
 	if (options.parseJson) {

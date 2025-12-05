@@ -14,11 +14,19 @@ plugins:
 # Custom Variables
 # ------------------------------------------------------------------------------
 custom:
-  # Log levels based on stage
-  logLevel:
-    prod: INFO
-    dev: DEBUG
-    local: TRACE
+  stage:
+    local:
+      log:
+        level: TRACE
+        event: true
+    dev:
+      log:
+        level: DEBUG
+        event: true
+    prod:
+      log:
+        level: INFO
+        event: false
   # DynamoDB Table configurations
   tables:
     books:
@@ -44,7 +52,7 @@ provider:
   logs:
     lambda:
       logFormat: JSON
-      applicationLogLevel: ${self:custom.logLevel.${sls:stage}, 'DEBUG'}
+      applicationLogLevel: ${self:custom.stage.${sls:stage}.log.level, 'DEBUG'}
       systemLogLevel: WARN
       logGroup: /aws/lambda/${self:service}-${sls:stage}
 
@@ -52,8 +60,9 @@ provider:
   environment:
     BOOKS_TABLE_NAME: !Ref BooksTable
     # AWS Powertools configuration
-    POWERTOOLS_LOG_LEVEL: ${self:custom.logLevel.${sls:stage}, 'DEBUG'}
+    POWERTOOLS_LOG_LEVEL: ${self:custom.stage.${sls:stage}.log.level, 'DEBUG'}
     POWERTOOLS_SERVICE_NAME: ${self:service}
+    POWERTOOLS_LOGGER_LOG_EVENT: ${self:custom.stage.${sls:stage}.log.event, 'false'}
 
 # ------------------------------------------------------------------------------
 # Functions
