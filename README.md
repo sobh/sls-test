@@ -35,7 +35,7 @@ The project is structured as follows:
 .
 ├── app
 │   ├── clients
-│   │   └── creatDynamoDBClient.ts
+│   │   └── createDynamoDBClient.ts
 │   ├── handlers
 │   │   ├── books
 │   │   │   ├── createBook.ts

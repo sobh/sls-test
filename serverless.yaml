@@ -127,6 +127,14 @@ functions:
         Resource: !GetAtt BooksTable.Arn
 
   # -- Test Handlers -----------------------------------------------------------
+  testEcho:
+    handler: app/handlers/tests/testEcho.handler
+    description: Test Echo
+    events:
+      - httpApi:
+          path: /tests/echo
+          method: post
+
   testExternalCall:
     handler: app/handlers/tests/testExternalCall.handler
     description: Test External Call

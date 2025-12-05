@@ -3,6 +3,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { BookModel, createBookModel } from '../../models/BookModel';
 import { BookSchema } from '../../schemas/BookSchemas';
 import { logger } from '../../services/logger';
+import { middyfy } from '../../utils/middyfy';
 
 // ---- Handler ----------------------------------------------------------------
 class CreateBookHandler {
@@ -10,7 +11,7 @@ class CreateBookHandler {
 
 	async processEvent(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
 		logger.info('Create Book Handler');
-		const body = JSON.parse(event.body ?? '');
+		const body = event.body || {};
 		const validBody = BookSchema.parse(body);
 
 		const book = await this.bookModel.createBook(validBody);
@@ -19,16 +20,10 @@ class CreateBookHandler {
 	}
 }
 
-export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-	try {
-		const bookModel = createBookModel();
-		const instance = new CreateBookHandler(bookModel);
-		return await instance.processEvent(event);
-	} catch (error) {
-		logger.error('Create book handler error', error as Error);
-		return {
-			statusCode: 500,
-			body: JSON.stringify({ error: 'Something went wrong check your log!' }),
-		};
-	}
+async function lambdaHandler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+	const bookModel = createBookModel();
+	const instance = new CreateBookHandler(bookModel);
+	return await instance.processEvent(event);
 }
+
+export const handler = middyfy(lambdaHandler, { parseJson: true });

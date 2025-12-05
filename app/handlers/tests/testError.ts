@@ -1,24 +1,25 @@
 // ---- Imports ----------------------------------------------------------------
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { logger } from '../../services/logger';
+import { middyfy } from '../../utils/middyfy';
 
 // ---- Handler ----------------------------------------------------------------
-class TestErrorHandler {
-	async processEvent(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-		logger.info('Test Error Handler');
-		throw new Error('Unhanded Error');
-	}
+
+/**
+ * Test Error Handler
+ *
+ * Throws an error to test error handling.
+ *
+ * @param event - The API Gateway event
+ * @param context - The Lambda context
+ * @returns The API Gateway response
+ */
+async function lambdaHandler(
+	event: APIGatewayProxyEvent,
+	context: Context,
+): Promise<APIGatewayProxyResult> {
+	logger.info('Test Error Handler - Using middyfy utility');
+	throw new Error('Unhandled Error from middyfy example');
 }
 
-export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
-	try {
-		const instance = new TestErrorHandler();
-		return await instance.processEvent(event);
-	} catch (error) {
-		logger.error('Test Error Handler Error', error as Error);
-		return {
-			statusCode: 500,
-			body: JSON.stringify({ error: 'Something went wrong check your log!' }),
-		};
-	}
-}
+export const handler = middyfy(lambdaHandler);
