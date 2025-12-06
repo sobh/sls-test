@@ -1,13 +1,12 @@
 // ---- Imports ----------------------------------------------------------------
 import { injectLambdaContext } from '@aws-lambda-powertools/logger/middleware';
-import { captureLambdaHandler } from '@aws-lambda-powertools/tracer/middleware';
 import middy from '@middy/core';
 import httpErrorHandler from '@middy/http-error-handler';
 import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpResponseSerializer from '@middy/http-response-serializer';
+import inputOutputLogger from '@middy/input-output-logger';
 import type { Handler } from 'aws-lambda';
 import { logger } from '../services/logger';
-import { tracer } from '../services/tracer';
 
 // ---- Types ------------------------------------------------------------------
 type MiddyOptions = { fallbackMessage?: string; parseJson?: boolean };
@@ -31,18 +30,40 @@ export function middyfy<TEvent = any, TResult = any>(
 ): middy.MiddyfiedHandler<TEvent, TResult> {
 	const middleware = middy(handler);
 
-	// Add Tracing
-	middleware.use(captureLambdaHandler(tracer));
+	// Input Output Logger
+	middleware.use(inputOutputLogger({
+		logger: (request) => {
+			const child = logger.createChild(request.context);
+			let logData = request.event ?? request.response;
+			if (typeof logData?.body === 'string') {
+				try {
+					logData = { ...logData, body: JSON.parse(logData.body) };
+				} catch {
+					// Ignore parse errors
+				}
+			}
+			child.info(logData);
+		},
+		awsContext: true,
+	}));
 
 	// Add Lambda Context to the logger
 	middleware.use(injectLambdaContext(logger));
 
-	// Add JSON body parser
+	// JSON body parser
 	if (options.parseJson) {
 		middleware.use(httpJsonBodyParser());
 	}
 
-	// Add response serializer (application/json)
+	// Always add error handler last
+	middleware.use(httpErrorHandler({
+		logger: (error) => {
+			logger.error('Unhandled error caught by middleware', error as Error);
+		},
+		fallbackMessage: options.fallbackMessage ?? 'Internal Server Error',
+	}));
+
+	// Response serializer (application/json)
 	middleware.use(
 		httpResponseSerializer({
 			serializers: [{
@@ -52,14 +73,6 @@ export function middyfy<TEvent = any, TResult = any>(
 			defaultContentType: 'application/json',
 		}),
 	);
-
-	// Always add error handler last
-	middleware.use(httpErrorHandler({
-		logger: (error) => {
-			logger.error('Unhandled error caught by middleware', error as Error);
-		},
-		fallbackMessage: options.fallbackMessage ?? 'Internal Server Error',
-	}));
 
 	return middleware;
 }

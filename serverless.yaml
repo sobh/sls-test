@@ -168,6 +168,14 @@ functions:
           path: /tests/calls/internal/{id}
           method: get
 
+  testInternalTracedCall:
+    handler: app/handlers/tests/testInternalTracedCall.handler
+    description: Test Internal Traced Call
+    events:
+      - httpApi:
+          path: /tests/calls/internal/traced/{id}
+          method: get
+
   testError:
     handler: app/handlers/tests/testError.handler
     description: Test Error
