@@ -21,7 +21,7 @@ class GetBookHandler implements LambdaInterface {
 			logger.info('Get Book', { book });
 			return { data: book };
 		} catch (cause) {
-			throw new NotFoundError('Book not found ID: ' + validId, cause);
+			throw new NotFoundError('Book not found ID: ' + validId, { bookId: validId }, cause);
 		}
 	}
 }

@@ -1,6 +1,5 @@
 // ---- Imports ----------------------------------------------------------------
 import axios, { type AxiosInstance } from 'axios';
-import { createErrorInterceptor } from './interceptors';
 
 // ---- Functions ------------------------------------------------------------
 
@@ -13,8 +12,6 @@ import { createErrorInterceptor } from './interceptors';
  */
 export function createHttpClient(timeout = 5000): AxiosInstance {
 	const client = axios.create({ timeout });
-	client.interceptors.response.use(createErrorInterceptor());
-
 	return client;
 }
 

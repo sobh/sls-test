@@ -1,79 +1,65 @@
-export class NotFoundError extends Error {
+export class HttpError extends Error {
 	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Not Found');
-		this.name = 'NotFoundError';
+	context: Record<string, unknown>;
+	constructor(
+		message?: string,
+		statusCode?: number,
+		context?: Record<string, unknown>,
+		cause?: unknown,
+	) {
+		super(message ?? 'Http Error');
+		this.name = 'HttpError';
 		this.cause = cause;
-		this.statusCode = 404;
+		this.statusCode = statusCode ?? 500;
+		this.context = context ?? {};
+		this.name = this.constructor.name;
 	}
 }
 
-export class BadRequestError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Bad Request');
-		this.name = 'BadRequestError';
-		this.cause = cause;
-		this.statusCode = 400;
+export class NotFoundError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Not Found', 404, context, cause);
 	}
 }
 
-export class InternalServerError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Internal Server Error');
-		this.name = 'InternalServerError';
-		this.cause = cause;
-		this.statusCode = 500;
+export class BadRequestError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Bad Request', 400, context, cause);
 	}
 }
 
-export class ForbiddenError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Forbidden');
-		this.name = 'ForbiddenError';
-		this.cause = cause;
-		this.statusCode = 403;
+export class InternalServerError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Internal Server Error', 500, context, cause);
 	}
 }
 
-export class UnauthorizedError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Unauthorized');
-		this.name = 'UnauthorizedError';
-		this.cause = cause;
-		this.statusCode = 401;
+export class ForbiddenError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Forbidden', 403, context, cause);
 	}
 }
 
-export class ServiceUnavailableError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Service Unavailable');
-		this.name = 'ServiceUnavailableError';
-		this.cause = cause;
-		this.statusCode = 503;
+export class UnauthorizedError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Unauthorized', 401, context, cause);
 	}
 }
 
-export class GatewayTimeoutError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Gateway Timeout');
-		this.name = 'GatewayTimeoutError';
-		this.cause = cause;
-		this.statusCode = 504;
+export class ServiceUnavailableError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Service Unavailable', 503, context, cause);
 	}
 }
 
-export class BadGatewayError extends Error {
-	statusCode: number;
-	constructor(message?: string, cause?: unknown) {
-		super(message ?? 'Bad Gateway');
-		this.name = 'BadGatewayError';
-		this.cause = cause;
-		this.statusCode = 502;
+export class GatewayTimeoutError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Gateway Timeout', 504, context, cause);
+	}
+}
+
+export class BadGatewayError extends HttpError {
+	constructor(message?: string, context?: Record<string, unknown>, cause?: unknown) {
+		super(message ?? 'Bad Gateway', 502, context, cause);
 	}
 }

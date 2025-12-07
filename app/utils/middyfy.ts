@@ -7,7 +7,6 @@ import httpResponseSerializer from '@middy/http-response-serializer';
 import inputOutputLogger from '@middy/input-output-logger';
 import type { Handler } from 'aws-lambda';
 import { logger } from '../services/logger';
-
 // ---- Types ------------------------------------------------------------------
 type MiddyOptions = { fallbackMessage?: string; parseJson?: boolean };
 
@@ -58,7 +57,7 @@ export function middyfy<TEvent = any, TResult = any>(
 	// Always add error handler last
 	middleware.use(httpErrorHandler({
 		logger: (error) => {
-			logger.error('Unhandled error caught by middleware', error as Error);
+			logger.error(`Error: ${error.message}`, error as Error);
 		},
 		fallbackMessage: options.fallbackMessage ?? 'Internal Server Error',
 	}));

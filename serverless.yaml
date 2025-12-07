@@ -17,7 +17,9 @@ build:
   esbuild:
     banner:
       js: 'import { createRequire } from "module"; import { fileURLToPath } from "url"; import { dirname } from "path"; const require = createRequire(import.meta.url); const __filename = fileURLToPath(import.meta.url); const __dirname = dirname(__filename);'
-
+    external:
+      - "@aws-sdk/*"
+      - "axios"
 # ------------------------------------------------------------------------------
 # Custom Variables
 # ------------------------------------------------------------------------------
@@ -48,13 +50,17 @@ provider:
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'} # Default to 'dev' if not specified
   region: eu-central-1
-  memorySize: 128 # Default memory size for functions (MB). Must be greater than 128
+  memorySize: 512 # Default memory size for functions (MB). Must be greater than 128
   timeout: 29 # Default timeout for functions (seconds). HTTP API limit is 30s.
 
   # Enable X-Ray tracing
   tracing:
     lambda: true
     apiGateway: true
+
+  # Global Layers
+  layers:
+    - arn:aws:lambda:eu-central-1:901920570463:layer:aws-otel-nodejs-amd64-ver-1-30-1:1
 
   # CloudWatch Logs configuration
   logs:
@@ -68,9 +74,27 @@ provider:
   environment:
     BOOKS_TABLE_NAME: !Ref BooksTable
     # AWS Powertools configuration
-    POWERTOOLS_LOG_LEVEL: ${self:custom.stage.${sls:stage}.log.level, 'DEBUG'}
     POWERTOOLS_SERVICE_NAME: ${self:service}
+    POWERTOOLS_SERVICE_VERSION: ${file(./package.json):version}
+    POWERTOOLS_LOG_LEVEL: ${self:custom.stage.${sls:stage}.log.level, 'DEBUG'}
     POWERTOOLS_LOGGER_LOG_EVENT: ${self:custom.stage.${sls:stage}.log.event, 'false'}
+    # OpenTelemetry Configuration
+    AWS_LAMBDA_EXEC_WRAPPER: /opt/otel-handler
+    OTEL_SERVICE_NAME: ${self:service}
+    OTEL_TRACES_SAMPLER: always_on
+    OTEL_PROPAGATORS: xray,tracecontext,baggage,xray-lambda
+    # Optimization to reduce cold start overhead
+    OTEL_NODE_ENABLED_INSTRUMENTATIONS: aws-lambda,aws-sdk,http,https,fetch
+    # Reduce OpenTelemetry logs
+    OPENTELEMETRY_EXTENSION_LOG_LEVEL: error # E.g. { "name": "otlp", "level": "info", ... }
+    # OTEL_LOG_LEVEL: "error"
+    # OTEL_AWS_LOG_LEVEL: "WARN"
+
+    # Disable Node’s experimental warnings
+    NODE_NO_WARNINGS: "1"
+
+    # Disable AWS callback handler warning
+    AWS_LAMBDA_NODEJS_DISABLE_CALLBACK_WARNING: "1"
 
 # ------------------------------------------------------------------------------
 # Functions

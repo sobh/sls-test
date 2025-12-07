@@ -1,7 +1,9 @@
 // ---- Imports ----------------------------------------------------------------
 import type { APIGatewayProxyEvent } from 'aws-lambda';
+import { BadGatewayError } from '../../errors/http';
 import { logger } from '../../services/logger';
 import { middyfy } from '../../utils/middyfy';
+import { injectTraceHeader } from '../../utils/otel';
 
 // ---- Handler ----------------------------------------------------------------
 
@@ -18,11 +20,15 @@ async function lambdaHandler(event: APIGatewayProxyEvent): Promise<any> {
 	logger.info('Test Internal Call Handler');
 	const bookId = event.pathParameters?.id ?? '';
 	const uri = `https://${event.requestContext.domainName}/books/${bookId}`;
-	logger.debug(`Call to internal service @ ${uri}`);
+	const headers = injectTraceHeader({ 'Content-Type': 'application/json' });
+	logger.debug(`Call to internal service @ ${uri}`, { uri, headers });
 
-	const response = await fetch(uri);
+	const response = await fetch(uri, { method: 'GET', headers });
 	if (!response.ok) {
-		logger.error(`Call to internal service @ ${uri} failed with status: ${response.status}`);
+		throw new BadGatewayError(
+			`Call to internal service ${uri} failed with status: ${response.status}`,
+			{ uri, status: response.status },
+		);
 	}
 	let body;
 
