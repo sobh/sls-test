@@ -1,0 +1,92 @@
+# ==============================================================================
+# Books Service Configuration
+# ==============================================================================
+service: books-service
+
+# ------------------------------------------------------------------------------
+# Custom Variables
+# ------------------------------------------------------------------------------
+custom:
+  tables:
+    books:
+      name: BooksTable
+
+provider:
+  environment:
+    BOOKS_TABLE_NAME: "!Ref BooksTable"
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Resource:
+            Fn::GetAtt:
+              - BooksTable
+              - Arn
+          Action:
+            - dynamodb:Scan
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+functions:
+  listBooks:
+    handler: handlers/listBooks.handler
+    description: List all books from DB
+    events:
+      - httpApi:
+          path: /books
+          method: get
+
+  createBook:
+    handler: handlers/createBook.handler
+    description: Create a new book on the DB
+    events:
+      - httpApi:
+          path: /books
+          method: post
+
+  getBook:
+    handler: handlers/getBook.handler
+    description: Get a book by ID
+    events:
+      - httpApi:
+          path: /books/{bookId}
+          method: get
+
+  updateBook:
+    handler: handlers/updateBook.handler
+    description: Update a book by ID
+    events:
+      - httpApi:
+          path: /books/{bookId}
+          method: put
+
+  deleteBook:
+    handler: handlers/deleteBook.handler
+    description: Delete a book by ID
+    events:
+      - httpApi:
+          path: /books/{bookId}
+          method: delete
+
+# ------------------------------------------------------------------------------
+# Resources (CloudFormation)
+# ------------------------------------------------------------------------------
+resources:
+  Resources:
+    BooksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.tables.books.name}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH

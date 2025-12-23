@@ -2,7 +2,8 @@
 
 ## Overview
 
-The `testEcho` handler demonstrates how to use Middy's `http-json-body-parser` middleware to automatically parse JSON request bodies.
+The `testEcho` handler demonstrates how to use Middy's `http-json-body-parser`
+middleware to automatically parse JSON request bodies.
 
 ## How It Works
 
@@ -53,11 +54,11 @@ curl -X POST http://localhost:3000/dev/test/echo \
 
 ## Key Features
 
-✅ **Automatic JSON Parsing** - No need to manually parse `event.body`
-✅ **Type Safety** - Custom `EchoEvent` type ensures correct typing
-✅ **Error Handling** - Middy's error handler catches any issues
-✅ **Logging** - AWS Powertools Logger tracks requests and responses
-✅ **Clean Code** - Middleware handles cross-cutting concerns
+✅ **Automatic JSON Parsing** - No need to manually parse `event.body` ✅ **Type
+Safety** - Custom `EchoEvent` type ensures correct typing ✅ **Error
+Handling** - Middy's error handler catches any issues ✅ **Logging** - AWS
+Powertools Logger tracks requests and responses ✅ **Clean Code** - Middleware
+handles cross-cutting concerns
 
 ## Code Breakdown
 
@@ -88,7 +89,8 @@ export const handler = middyfy(lambdaHandler, { parseJson: true });
 
 ## Important Notes
 
-1. **Content-Type Header**: The client must send `Content-Type: application/json`
+1. **Content-Type Header**: The client must send
+   `Content-Type: application/json`
 2. **Body Type**: After parsing, `event.body` is an object, not a string
 3. **Error Handling**: Invalid JSON will be caught by Middy's error handler
 4. **Response Format**: You still need to stringify the response body

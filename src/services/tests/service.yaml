@@ -1,0 +1,48 @@
+# ==============================================================================
+# Tests Service Configuration
+# ==============================================================================
+service: tests-service
+
+# ------------------------------------------------------------------------------
+# Functions
+# ------------------------------------------------------------------------------
+functions:
+  testEcho:
+    handler: handlers/testEcho.handler
+    description: Test Echo
+    events:
+      - httpApi:
+          path: /tests/echo
+          method: post
+
+  testExternalCall:
+    handler: handlers/testExternalCall.handler
+    description: Test External Call
+    events:
+      - httpApi:
+          path: /tests/calls/external
+          method: get
+
+  testInternalCall:
+    handler: handlers/testInternalCall.handler
+    description: Test Internal Call
+    events:
+      - httpApi:
+          path: /tests/calls/internal/{id}
+          method: get
+
+  testInternalTracedCall:
+    handler: handlers/testInternalTracedCall.handler
+    description: Test Internal Traced Call
+    events:
+      - httpApi:
+          path: /tests/calls/internal/traced/{id}
+          method: get
+
+  testError:
+    handler: handlers/testError.handler
+    description: Test Error
+    events:
+      - httpApi:
+          path: /tests/error
+          method: get

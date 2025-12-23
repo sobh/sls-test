@@ -1,72 +1,40 @@
-# Serverless Basics
+# 📦 Serverless Basics - Monorepo
 
-This is a sample project for testing the Serverless framework.
+This is a Serverless Framework monorepo project demonstrating best practices for
+organizing multiple microservices with shared libraries.
 
-## Installation
+## 📥 Installation
 
-To install the project dependencies, run the following command:
+To install the project dependencies, run:
 
 ```bash
 npm install
 ```
 
-## Deployment
+## 📚 Documentation
 
-To deploy the service, run the following command:
+For a deeper dive into the project's architecture, usage, and features, please
+refer to the following documents:
 
-```bash
-serverless deploy
-```
+- **[Monorepo Structure](./docs/monorepo.md)**: Detailed explanation of the
+  project structure, services, and shared libraries.
+- **[Quick Reference](./docs/quick_reference.md)**: A handy guide for common
+  commands and service endpoints.
+- **[Serverless Compose Guide](./docs/sls_compose.md)**: In-depth guide to using
+  Serverless Compose for orchestration.
+- **[Middy and Powertools Integration](./docs/middy-powertools-integration.md)**:
+  How to integrate Middy with AWS Powertools Logger.
+- **[Echo Handler Example](./docs/echo-handler-example.md)**: A practical
+  example of a Lambda handler with JSON parsing.
 
-## Architecture
+## 🧩 Features
 
-This project follows a standard serverless architecture, using AWS Lambda and
-DynamoDB. The API Gateway is used to expose the Lambda functions as a REST API.
-
-The architecture is designed to be simple and scalable. Each handler has a
-single responsibility, and the business logic is separated from the
-infrastructure code.
-
-## Project Structure
-
-The project is structured as follows:
-
-```text
-.
-├── app
-│   ├── clients
-│   │   └── createDynamoDBClient.ts
-│   ├── handlers
-│   │   ├── books
-│   │   │   ├── createBook.ts
-│   │   │   ├── deleteBook.ts
-│   │   │   ├── getBook.ts
-│   │   │   ├── listBooks.ts
-│   │   │   └── updateBook.ts
-│   │   └── tests
-│   │       ├── testError.ts
-│   │       ├── testExternalCall.ts
-│   │       └── testInternalCall.ts
-│   ├── models
-│   │   └── BookModel.ts
-│   ├── repositories
-│   │   └── BookRepository.ts
-│   ├── schemas
-│   │   └── BookSchemas.ts
-│   └── services
-│       └── logger.ts
-├── serverless.yaml
-├── package.json
-└── tsconfig.json
-```
-
-- `app/clients`: Contains the DynamoDB client.
-- `app/handlers`: Contains the Lambda handlers, organized by domain (e.g.,
-  `books`, `tests`).
-- `app/models`: Contains the business logic.
-- `app/repositories`: Contains the database logic.
-- `app/schemas`: Contains the Zod schemas for validation.
-- `app/services`: Contains shared services like the logger.
-- `serverless.yaml`: Contains the Serverless framework configuration.
-- `package.json`: Contains the project dependencies.
-- `tsconfig.json`: Contains the TypeScript configuration.
+- ✅ **Serverless Compose** - Orchestrate multiple services
+- ✅ **Independent Services** - Deploy services separately
+- ✅ **Shared Libraries** - Reduce code duplication
+- ✅ **TypeScript** - Full type safety
+- ✅ **AWS Powertools** - Structured logging
+- ✅ **OpenTelemetry** - Distributed tracing
+- ✅ **Middy** - Lambda middleware
+- ✅ **Zod** - Runtime validation
+- ✅ **ESBuild** - Fast builds

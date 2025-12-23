@@ -1,7 +1,7 @@
 // ---- Imports ----------------------------------------------------------------
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { logger } from '../../services/logger';
-import { middyfy } from '../../utils/middyfy';
+import { logger } from '../../../lib/utils/logger';
+import { middyfy } from '../../../lib/utils/middyfy';
 
 // ---- Handler ----------------------------------------------------------------
 

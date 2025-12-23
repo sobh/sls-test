@@ -6,7 +6,7 @@ import httpJsonBodyParser from '@middy/http-json-body-parser';
 import httpResponseSerializer from '@middy/http-response-serializer';
 import inputOutputLogger from '@middy/input-output-logger';
 import type { Handler } from 'aws-lambda';
-import { logger } from '../services/logger';
+import { logger } from './logger';
 // ---- Types ------------------------------------------------------------------
 type MiddyOptions = { fallbackMessage?: string; parseJson?: boolean };
 

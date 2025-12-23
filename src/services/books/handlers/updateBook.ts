@@ -2,9 +2,9 @@
 import type { LambdaInterface } from '@aws-lambda-powertools/commons/types';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { BookModel, createBookModel } from '../../models/BookModel';
-import { BookSchema } from '../../schemas/BookSchemas';
-import { middyfy } from '../../utils/middyfy';
+import { middyfy } from '../../../lib/utils/middyfy';
+import { BookModel, createBookModel } from '../models/BookModel';
+import { BookSchema } from '../schemas/BookSchemas';
 
 // ---- Handler ----------------------------------------------------------------
 class UpdateBookHandler implements LambdaInterface {

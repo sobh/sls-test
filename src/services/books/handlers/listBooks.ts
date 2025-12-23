@@ -1,9 +1,9 @@
 // ---- Imports ----------------------------------------------------------------
 import type { LambdaInterface } from '@aws-lambda-powertools/commons/types';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { BookModel, createBookModel } from '../../models/BookModel';
-import { logger } from '../../services/logger';
-import { middyfy } from '../../utils/middyfy';
+import { logger } from '../../../lib/utils/logger';
+import { middyfy } from '../../../lib/utils/middyfy';
+import { BookModel, createBookModel } from '../models/BookModel';
 
 // ---- Handler ----------------------------------------------------------------
 class ListBooksHandler implements LambdaInterface {

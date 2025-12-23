@@ -1,13 +1,17 @@
 {
-	"lineWidth": 100,
+	"lineWidth": 80,
 	"useTabs": true,
 	"indentWidth": 4,
 	"typescript": {
+		"lineWidth": 100,
 		"quoteStyle": "preferSingle",
 		"preferSingleLine": true
 	},
 	"json": {},
-	"markdown": {},
+	"markdown": {
+		"lineWidth": 80,
+		"textWrap": "always"
+	},
 	"yaml": {
 		"indentWidth": 2
 	},

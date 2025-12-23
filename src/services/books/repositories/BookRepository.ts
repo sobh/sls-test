@@ -11,7 +11,7 @@ import {
 } from '@aws-sdk/lib-dynamodb';
 import { uuidv7 } from 'uuidv7';
 
-import { createDynamoDBClient } from '../clients/createDynamoDBClient';
+import { createDynamoDBClient } from '../../../lib/clients/createDynamoDBClient';
 
 // ---- Constants -------------------------------------------------------------
 const TABLE_NAME = process.env.BOOKS_TABLE_NAME;

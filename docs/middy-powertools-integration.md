@@ -1,6 +1,7 @@
 # Integrating Middy with AWS Powertools Logger
 
-This guide explains how to use Middy's error handler with AWS Powertools Logger in your Serverless application.
+This guide explains how to use Middy's error handler with AWS Powertools Logger
+in your Serverless application.
 
 ## The Problem
 
@@ -27,12 +28,17 @@ import middy from '@middy/core';
 import httpErrorHandler from '@middy/http-error-handler';
 import { logger } from '../../services/logger';
 
-export const handler = middy(lambdaHandler).use(httpErrorHandler({
-	logger: (error) => {
-		logger.error('Unhandled error caught by middleware', error as Error);
-	},
-	fallbackMessage: 'Internal Server Error',
-}));
+export const handler = middy(lambdaHandler).use(
+	httpErrorHandler({
+		logger: (error) => {
+			logger.error(
+				'Unhandled error caught by middleware',
+				error as Error,
+			);
+		},
+		fallbackMessage: 'Internal Server Error',
+	}),
+);
 ```
 
 **Pros:**
@@ -59,7 +65,9 @@ async function lambdaHandler(event, context) {
 	// Your handler logic
 }
 
-export const handler = middyfy(lambdaHandler, { fallbackMessage: 'Internal Server Error' });
+export const handler = middyfy(lambdaHandler, {
+	fallbackMessage: 'Internal Server Error',
+});
 ```
 
 **Pros:**
@@ -79,7 +87,8 @@ export const handler = middyfy(lambdaHandler, { fallbackMessage: 'Internal Serve
 The `middyfy` utility:
 
 1. **Wraps your handler** with Middy middleware
-2. **Integrates AWS Powertools Logger** by providing a compatible wrapper function
+2. **Integrates AWS Powertools Logger** by providing a compatible wrapper
+   function
 3. **Handles errors** automatically and logs them with proper context
 4. **Returns formatted error responses** to API Gateway
 
@@ -99,7 +108,10 @@ export function middyfy<TEvent = any, TResult = any>(
 		.use(validator({ eventSchema: options.schema })) // Validate input
 		.use(httpErrorHandler({
 			logger: (error) => {
-				logger.error('Unhandled error caught by middleware', error as Error);
+				logger.error(
+					'Unhandled error caught by middleware',
+					error as Error,
+				);
 			},
 			fallbackMessage: options.fallbackMessage ?? 'Internal Server Error',
 		}));

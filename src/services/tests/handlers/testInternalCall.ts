@@ -1,9 +1,9 @@
 // ---- Imports ----------------------------------------------------------------
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { BadGatewayError } from '../../errors/http';
-import { logger } from '../../services/logger';
-import { middyfy } from '../../utils/middyfy';
-import { injectTraceHeader } from '../../utils/otel';
+import { BadGatewayError } from '../../../lib/errors/http';
+import { logger } from '../../../lib/utils/logger';
+import { middyfy } from '../../../lib/utils/middyfy';
+import { injectTraceHeader } from '../../../lib/utils/otel';
 
 // ---- Handler ----------------------------------------------------------------
 

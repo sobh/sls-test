@@ -1,0 +1,22 @@
+# ==============================================================================
+# Serverless Compose Configuration
+# ==============================================================================
+# This file orchestrates multiple Serverless services in the monorepo.
+# It allows you to deploy, remove, and manage all services together.
+#
+# Usage:
+#   serverless deploy           # Deploy all services
+#   serverless remove           # Remove all services
+#   serverless info             # Get info about all services
+#   serverless logs -s books    # Get logs for a specific service
+# ==============================================================================
+
+services:
+  books:
+    path: src/services/books
+
+  tests:
+    path: src/services/tests
+    # Tests service can depend on books service if needed
+    # dependsOn:
+    #   - books

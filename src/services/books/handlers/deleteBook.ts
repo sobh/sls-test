@@ -2,33 +2,29 @@
 import type { LambdaInterface } from '@aws-lambda-powertools/commons/types';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { z } from 'zod';
-import { NotFoundError } from '../../errors/http';
-import { BookModel, createBookModel } from '../../models/BookModel';
-import { logger } from '../../services/logger';
-import { middyfy } from '../../utils/middyfy';
+import { logger } from '../../../lib/utils/logger';
+import { middyfy } from '../../../lib/utils/middyfy';
+import { BookModel, createBookModel } from '../models/BookModel';
 
 // ---- Handler ----------------------------------------------------------------
-class GetBookHandler implements LambdaInterface {
+class DeleteBookHandler implements LambdaInterface {
 	constructor(private readonly bookModel: BookModel) {}
 
 	async handler(event: APIGatewayProxyEvent): Promise<any> {
+		logger.info('Delete Book Handler: Start');
 		const bookId = event.pathParameters?.bookId ?? '';
 		const validId = z.uuidv7().parse(bookId);
-		logger.info(`Get Book ID: ${validId}`);
 
-		try {
-			const book = await this.bookModel.getBook(validId);
-			logger.info('Get Book', { book });
-			return { data: book };
-		} catch (cause) {
-			throw new NotFoundError('Book not found ID: ' + validId, { bookId: validId }, cause);
-		}
+		const deletedBookId = await this.bookModel.deleteBook(validId);
+
+		logger.info('Delete Book Handler: Book ID', { deletedBookId });
+		return { data: deletedBookId };
 	}
 }
 
 async function lambdaHandler(event: APIGatewayProxyEvent): Promise<any> {
 	const bookModel = createBookModel();
-	const instance = new GetBookHandler(bookModel);
+	const instance = new DeleteBookHandler(bookModel);
 	return await instance.handler(event);
 }
 
