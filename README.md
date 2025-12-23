@@ -22,6 +22,8 @@ refer to the following documents:
   commands and service endpoints.
 - **[Serverless Compose Guide](./docs/sls_compose.md)**: In-depth guide to using
   Serverless Compose for orchestration.
+- **[OpenTelemetry Guide](./docs/opentelemetry.md)**: An explanation of the
+  distributed tracing setup with OpenTelemetry and ADOT.
 - **[Middy and Powertools Integration](./docs/middy-powertools-integration.md)**:
   How to integrate Middy with AWS Powertools Logger.
 - **[Echo Handler Example](./docs/echo-handler-example.md)**: A practical
