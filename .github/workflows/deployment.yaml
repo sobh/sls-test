@@ -29,21 +29,21 @@ jobs:
         id: detect
         run: |
           if [ -n "${{ github.event.inputs.services }}" ]; then
-            services="${{ github.event.inputs.services }}"
-            echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
+              services="${{ github.event.inputs.services }}"
+              echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
           else
-            git fetch origin ${{ github.event.before }} --depth=1
-            services=$(
-              git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-              | awk -F/ '$0 ~ "src/apps" {print $3}' \
-              | sort -u \
-              | tr '\n' ' '
-            )
+              git fetch origin ${{ github.event.before }} --depth=1
+              services=$(
+                git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+                | awk -F/ '$0 ~ "src/apps" {print $3}' \
+                | sort -u \
+                | tr '\n' ' '
+              )
           fi
 
           if [[ -z "$services" ]]; then
-            echo "🚫 No apps to deploy"
-            exit 1
+              echo "🚫 No apps to deploy"
+              exit 1
           fi
 
           echo "🛒 Selected Services: $services"
@@ -88,23 +88,24 @@ jobs:
           echo "🛒 Selected Services: ${{ steps.detect.outputs.services }}"
 
           for service in ${{ steps.detect.outputs.services }}; do
-            echo "🚀 Deploying the `$service` service"
-            sls_out=$(
-              npx sls deploy \
-              --service="$service" \
-              --stage=${{ env.STAGE }} 1>/dev/null
-            )
-            echo "$sls_out"
-
-            if echo "$sls_out" | grep -q "No changes to deploy"; then
-              result+=$(printf "\t⚠️ $service skipped\n")
-            elif echo "$sls_out" | grep -q "Exit code: 0"; then
-              result+=$(printf "\t✅ $service deployed\n")
-            else
-              result+=$(printf "\t❌ $service failed\n")
-              status="❌ One, or more services failed the Deployment"
-              exit_status=1
-            fi
+              echo "🚀 Deploying the `$service` service"
+              sls_cmd=$(
+                  npx sls deploy \
+                  --service="$service" \
+                  --stage=${{ env.STAGE }} 1>/dev/null
+              )
+              sls_status=$?
+              echo "$sls_out"
+            
+              if [ $sls_status -ne 0 ]; then
+                  result+=$(printf "\t❌ $service failed\n")
+                  status="❌ One, or more services failed the Deployment"
+                  exit_status=1
+              elif echo "$sls_out" | grep -iq "no change"; then
+                  result+=$(printf "\t⚠️ $service skipped\n")
+              else
+                  result+=$(printf "\t✅ $service deployed\n")
+              fi
           done
 
           echo "📝 Deployment Status: $status"
@@ -146,6 +147,6 @@ jobs:
           EOF
 
           aws sns publish \
-            --topic-arn $TOPIC_ARN \
-            --message file://file.txt \
-            --subject "GitHub Actions Build: ${{ github.repository }} ${{ env.STAGE }} "
+              --topic-arn $TOPIC_ARN \
+              --message file://file.txt \
+              --subject "GitHub Actions Build: ${{ github.repository }} ${{ env.STAGE }} "
