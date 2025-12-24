@@ -12,7 +12,7 @@ on:
         required: false
 
 jobs:
-  # ==== Service Selection ===========================================_=========
+  # ==== Service Selection =====================================================
   service_selection:
     name: 🛒 Service Selection
     runs-on: ubuntu-latest
@@ -143,20 +143,20 @@ jobs:
           TOPIC_ARN: ${{ secrets.TOPIC_ARN }}
         run: |
           cat << EOF > file.txt
-          **🏗️ Environment**: ${{ env.STAGE }}
+          🏗️ Environment: ${{ env.STAGE }}
 
-          **📊 Status**: ${{ steps.deploy.outputs.status }}
+          📊 Status: ${{ steps.deploy.outputs.status }}
 
-          **📝 Summary**:
+          📝 Summary:
           ${{ steps.deploy.outputs.result }}
 
-          **🎯 Deployment Target**: ${{ github.ref }}
-          **🔫 Triggered By**:      ${{ github.actor }}
-          **Event Type**:           ${{ github.event_name }}
-          **🪪 Commit ID**:         ${{ github.sha }}
-          **💬 Commit Message**:    ${{ github.event.head_commit.message }}
-          **🔢 Build Number**:      ${{ github.run_number }}
-          **🪣 Repository**:        ${{ github.repository }}
+          🎯 Deployment Target: ${{ github.ref }}
+          🔫 Triggered By:      ${{ github.actor }}
+          💥 Event Type:        ${{ github.event_name }}
+          🪪 Commit ID:         ${{ github.sha }}
+          💬 Commit Message:    ${{ github.event.head_commit.message }}
+          🔢 Build Number:      ${{ github.run_number }}
+          🪣 Repository:        ${{ github.repository }}
 
           More info at: https://github.com/${{ github.repository }}/commit/${{ github.sha }}/checks
           EOF
