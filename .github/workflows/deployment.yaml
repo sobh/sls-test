@@ -17,6 +17,7 @@ jobs:
     environment: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
     env:
       STAGE: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
+      AWS_REGION: ${{ secrets.REGION }}
 
     steps:
       # ---- Checkout Code -----------------------------------------------------
@@ -42,7 +43,7 @@ jobs:
 
           if [[ -z "$services" ]]; then
             echo "🚫 No apps to deploy"
-            exit 0
+            exit 1
           fi
 
           echo "🛒 Selected Services: $services"
@@ -65,7 +66,7 @@ jobs:
 
       - name: 📦 Install NPM Dependencies
         run: |
-          npm run co:login
+          # npm run co:login
           npm ci --include=dev
 
       # ---- Deployment --------------------------------------------------------
@@ -91,8 +92,7 @@ jobs:
             sls_out=$(
               npx sls deploy \
               --service="$service" \
-              --stage=${{ env.STAGE }} \
-              --region=${{ secrets.AWS_REGION }} 1>/dev/null
+              --stage=${{ env.STAGE }} 1>/dev/null
             )
             echo "$sls_out"
 
