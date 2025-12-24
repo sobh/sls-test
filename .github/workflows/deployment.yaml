@@ -85,13 +85,6 @@ jobs:
           npm ci --include=dev
 
       # ---- Deployment --------------------------------------------------------
-      - name: 🔐🏗️ Configure AWS Credentials (Deployment)
-        uses: aws-actions/configure-aws-credentials@v5
-        with:
-          aws-access-key-id: ${{ env.STAGE == 'prod' && secrets.PROD_ACCESS_KEY || secrets.DEV_ACCESS_KEY }}
-          aws-secret-access-key: ${{ env.STAGE == 'prod' && secrets.PROD_SECRET_KEY || secrets.DEV_SECRET_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
       - name: 🚀 Deploy Lambda Services
         id: deploy
         run: |
@@ -104,30 +97,38 @@ jobs:
           echo "🛒 Selected Services: ${{ needs.service_selection.outputs.services }}"
 
           for service in ${{ needs.service_selection.outputs.services }}; do
-              echo "🚀 Deploying the '$service' service"
+            echo "🚀 Deploying the '$service' service"
 
-              sls_result=$(npx sls deploy --service="$service" --stage="${STAGE}" 2>&1)
-              sls_status=$?
+            sls_result=$(npx sls deploy --service="$service" --stage="${STAGE}" 2>&1)
+            sls_status=$?
 
-              echo "$sls_result"
+            echo "$sls_result"
 
-              if [ "$sls_status" -ne 0 ]; then
-                  status="❌ One, or more services failed the Deployment"
-                  result=$(️️️printf "$result\t❌ ${service} failed\n")
-                  exit_status=1
-              elif echo "$sls_result" | grep -qi 'skipped\|no change\|nothing to deploy'; then
-                  result=$(️️️printf "$result\t⏭️ ${service} : skipped\n")
-              else
-                  result=$(️️️printf "$result\t✅ ${service} : deployed\n")
-              fi
+            if [ "$sls_status" -ne 0 ]; then
+              status="❌ One or more services failed the Deployment"
+              # Append with escape sequences
+              result="${result}\t❌ ${service} failed\n"
+              exit_status=1
+            elif echo "$sls_result" | grep -qi 'skipped\|no change\|nothing to deploy'; then
+              result="${result}\t⏭️ ${service} : skipped\n"
+            else
+              result="${result}\t✅ ${service} : deployed\n"
+            fi
           done
 
+          # Print result interpreting escapes
           echo "📝 Deployment Status: $status"
-          echo "$result"
+          printf "%b" "$result"
 
-          echo "status=$status" >> "$GITHUB_OUTPUT"
-          echo "result=$result" >> "$GITHUB_OUTPUT"
-          exit $exit_status
+          # GitHub Actions multiline output
+          {
+            echo "status=$status"
+            echo "result<<EOF"
+            printf "%b" "$result"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          exit "$exit_status"
 
       # ---- AWS SNS Notification ----------------------------------------------
       - name: 🔐🔔 Configure AWS Credentials (SNS)
