@@ -34,7 +34,7 @@ jobs:
             git fetch origin ${{ github.event.before }} --depth=1
             services=$(
               git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-              | awk -F/ '$0 ~ "src/apps" {print $3}' \
+              | awk -F/ '$0 ~ "src/services" {print $3}' \
               | sort -u \
               | tr '\n' ' '
             )
