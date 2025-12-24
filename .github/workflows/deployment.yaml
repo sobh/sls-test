@@ -119,6 +119,8 @@ jobs:
               else
                   result+=$(printf "\t✅ $service : deployed\n")
               fi
+
+              echo $sls_out
           done
 
           echo "📝 Deployment Status: $status"
