@@ -32,7 +32,7 @@ async function lambdaHandler(event: EchoEvent, context: Context): Promise<any> {
 		timestamp: new Date().toISOString(),
 	};
 
-	logger.info('Echo handler - sending response', { response: responseBody });
+	logger.info('Echo handler - sending response ', { response: responseBody });
 
 	return responseBody;
 }
