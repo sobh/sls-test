@@ -28,22 +28,22 @@ jobs:
         id: detect
         run: |
           if [ -n "${{ github.event.inputs.services }}" ]; then
-            services="${{ github.event.inputs.services }}"
-            echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
+              services="${{ github.event.inputs.services }}"
+              echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
           else
-            git fetch origin ${{ github.event.before }} --depth=1
-            services=$(
-              git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-              | awk -F/ '$0 ~ "src/services" {print $3}' \
-              | sort -u \
-              | tr '\n' ' '
-            )
+              git fetch origin ${{ github.event.before }} --depth=1
+              services=$(
+                git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+                | awk -F/ '$0 ~ "src/services" {print $3}' \
+                | sort -u \
+                | tr '\n' ' '
+              )
           fi
 
           if [[ -z "$services" ]]; then
-            echo "🚫 No apps to deploy"
+              echo "🚫 No apps to deploy"
           else
-            echo "🛒 Selected Services: $services"
+              echo "🛒 Selected Services: $services"
           fi
 
           echo "services=$services" >> "$GITHUB_OUTPUT"
@@ -104,10 +104,10 @@ jobs:
 
           for service in ${{ needs.service_selection.outputs.services }}; do
               echo "🚀 Deploying the `$service` service"
-              sls_cmd=$(
-                  npx sls deploy \
-                  --service="$service" \
-                  --stage=${{ env.STAGE }} 1>/dev/null
+              sls_out=$(
+                npx sls deploy \
+                --service="$service" \
+                --stage=${{ env.STAGE }} 2>&1
               )
               sls_status=$?
               echo "$sls_out"
@@ -117,9 +117,9 @@ jobs:
                   status="❌ One, or more services failed the Deployment"
                   exit_status=1
               elif echo "$sls_out" | grep -iq "no change"; then
-                  result+=$(printf "\t⚠️ $service skipped\n")
+                  result+=$(printf "\t⚠️ $service : skipped\n")
               else
-                  result+=$(printf "\t✅ $service deployed\n")
+                  result+=$(printf "\t✅ $service : deployed\n")
               fi
           done
 
