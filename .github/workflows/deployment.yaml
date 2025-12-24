@@ -103,20 +103,18 @@ jobs:
           echo "🛒 Selected Services: ${{ needs.service_selection.outputs.services }}"
 
           for service in ${{ needs.service_selection.outputs.services }}; do
-              echo "🚀 Deploying the `$service` service"
-              sls_out=$(
+              echo "🚀 Deploying the '$service' service"
+              sls_cmd(){
                 npx sls deploy \
                 --service="$service" \
                 --stage=${{ env.STAGE }} 2>&1
-              )
-              sls_status=$?
-              echo "$sls_out"
+              }
 
-              if [ $sls_status -ne 0 ]; then
+              if !sls_out=$(sls_cmd); then
                   result+=$(printf "\t❌ $service failed\n")
                   status="❌ One, or more services failed the Deployment"
                   exit_status=1
-              elif echo "$sls_out" | grep -iq "no change"; then
+              elif echo "$sls_out" | grep -iq "Deployment skipped"; then
                   result+=$(printf "\t⚠️ $service : skipped\n")
               else
                   result+=$(printf "\t✅ $service : deployed\n")
