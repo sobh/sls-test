@@ -12,13 +12,12 @@ on:
         required: false
 
 jobs:
-  deploy:
+  # ==== Service Selection ===========================================_=========
+  service_selection:
+    name: 🛒 Service Selection
     runs-on: ubuntu-latest
-    environment: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
-    env:
-      STAGE: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
-      AWS_REGION: eu-central-1
-
+    outputs:
+      services: ${{ steps.detect.outputs.services }}
     steps:
       # ---- Checkout Code -----------------------------------------------------
       - name: 📥 Checkout Code
@@ -29,25 +28,41 @@ jobs:
         id: detect
         run: |
           if [ -n "${{ github.event.inputs.services }}" ]; then
-              services="${{ github.event.inputs.services }}"
-              echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
+            services="${{ github.event.inputs.services }}"
+            echo "⚠️ Service Change Detection is Overridden by the Dispatcher Input"
           else
-              git fetch origin ${{ github.event.before }} --depth=1
-              services=$(
-                git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
-                | awk -F/ '$0 ~ "src/apps" {print $3}' \
-                | sort -u \
-                | tr '\n' ' '
-              )
+            git fetch origin ${{ github.event.before }} --depth=1
+            services=$(
+              git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+              | awk -F/ '$0 ~ "src/apps" {print $3}' \
+              | sort -u \
+              | tr '\n' ' '
+            )
           fi
 
           if [[ -z "$services" ]]; then
-              echo "🚫 No apps to deploy"
-              exit 1
+            echo "🚫 No apps to deploy"
+          else
+            echo "🛒 Selected Services: $services"
           fi
 
-          echo "🛒 Selected Services: $services"
           echo "services=$services" >> "$GITHUB_OUTPUT"
+
+  # ==== Deployment ============================================================
+  deployment:
+    name: 🚀 Deployment
+    needs: [service_selection]
+    if: ${{ needs.service_selection.outputs.services != '' }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
+    env:
+      STAGE: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
+      AWS_REGION: eu-central-1
+
+    steps:
+      # ---- Checkout Code -----------------------------------------------------
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v6
 
       # ---- Setup -------------------------------------------------------------
       - name: 🛠️ Setup Node.js
@@ -85,9 +100,9 @@ jobs:
           result=""
           exit_status=0
 
-          echo "🛒 Selected Services: ${{ steps.detect.outputs.services }}"
+          echo "🛒 Selected Services: ${{ needs.service_selection.outputs.services }}"
 
-          for service in ${{ steps.detect.outputs.services }}; do
+          for service in ${{ needs.service_selection.outputs.services }}; do
               echo "🚀 Deploying the `$service` service"
               sls_cmd=$(
                   npx sls deploy \
@@ -96,7 +111,7 @@ jobs:
               )
               sls_status=$?
               echo "$sls_out"
-            
+
               if [ $sls_status -ne 0 ]; then
                   result+=$(printf "\t❌ $service failed\n")
                   status="❌ One, or more services failed the Deployment"
