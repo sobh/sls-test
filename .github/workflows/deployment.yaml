@@ -17,7 +17,7 @@ jobs:
     environment: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
     env:
       STAGE: ${{ github.ref_name == 'prod' && 'prod' || 'dev' }}
-      AWS_REGION: ${{ secrets.REGION }}
+      AWS_REGION: eu-central-1
 
     steps:
       # ---- Checkout Code -----------------------------------------------------
@@ -62,7 +62,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.CODEARTIFACT_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.CODEARTIFACT_SECRET_KEY }}
-          aws-region: ${{ secrets.REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: 📦 Install NPM Dependencies
         run: |
@@ -75,7 +75,7 @@ jobs:
         with:
           aws-access-key-id: ${{ env.STAGE == 'prod' && secrets.PROD_ACCESS_KEY || secrets.DEV_ACCESS_KEY }}
           aws-secret-access-key: ${{ env.STAGE == 'prod' && secrets.PROD_SECRET_KEY || secrets.DEV_SECRET_KEY }}
-          aws-region: ${{ secrets.REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: 🚀 Deploy Lambda Services
         id: deploy
@@ -120,7 +120,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.PROD_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.PROD_SECRET_KEY }}
-          aws-region: ${{ secrets.REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: 📢 AWS Publish Deployment Notifications
         env:
