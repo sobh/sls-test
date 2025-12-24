@@ -94,8 +94,9 @@ jobs:
 
       - name: 🚀 Deploy Lambda Services
         id: deploy
-        shell: bash
         run: |
+          set +e
+
           status="✅ Successful Deployment"
           result=""
           exit_status=0
@@ -104,21 +105,21 @@ jobs:
 
           for service in ${{ needs.service_selection.outputs.services }}; do
               echo "🚀 Deploying the '$service' service"
-              sls_result="$(npx sls deploy --service="$service" --stage=${{ env.STAGE }} 2>&1)"
+
+              sls_result=$(npx sls deploy --service="$service" --stage="${STAGE}" 2>&1)
               sls_status=$?
 
-              echo $sls_result
+              printf '%s\n' "$sls_result"
 
-              if [[ $sls_status -ne 0 ]]; then
-                  result+=$(printf "\t❌ $service failed\n")
+              if [ "$sls_status" -ne 0 ]; then
+                  result="${result}	❌ ${service} failed\n"
                   status="❌ One, or more services failed the Deployment"
                   exit_status=1
-              elif echo "$OUTPUT" | grep -qiE "skipped|no changes|nothing to deploy"; then
-                  result+=$(printf "\t⏭️ $service : skipped\n")
+              elif printf '%s\n' "$sls_result" | grep -qi 'skipped\|no change\|nothing to deploy'; then
+                  result="${result}	⏭️ ${service} : skipped\n"
               else
-                  result+=$(printf "\t✅ $service : deployed\n")
+                  result="${result}	✅ ${service} : deployed\n"
               fi
-
           done
 
           echo "📝 Deployment Status: $status"
